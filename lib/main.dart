@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:instagram/Responsive/mobile_screen_layout.dart';
 import 'package:instagram/Responsive/responsive_layout_screen.dart';
 import 'package:instagram/Responsive/web_screen_layout.dart';
+import 'package:instagram/Screens/login_screen.dart';
+import 'package:instagram/Screens/signup_screen.dart';
 import 'package:instagram/Utils/colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -35,9 +37,11 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Clone',
       theme: ThemeData.dark()
           .copyWith(scaffoldBackgroundColor: mobileBackgroundColor),
-      home: const ResponsiveLayoutScreen(
-          mobileScreenLayout: MobileScreenLayout(),
-          webScreenLayout: WebScreenLayout()),
+      // home: const ResponsiveLayoutScreen(
+      //   mobileScreenLayout: MobileScreenLayout(),
+      //   webScreenLayout: WebScreenLayout(),
+      // ),
+      home: const SignupScreen(),
     );
   }
 }
