@@ -10,7 +10,8 @@ import 'package:instagram/Utils/colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensures Flutter is initialized before running
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
@@ -20,7 +21,9 @@ void main() async {
           projectId: 'flutter-clone-c2281'),
     );
   } else {
-    await Firebase.initializeApp;
+    debugPrint('in else section ');
+    await Firebase.initializeApp();
+    debugPrint('flutter initialize');
   }
 
   runApp(const MyApp());
