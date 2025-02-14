@@ -15,7 +15,7 @@ class AuthMethod {
     required String password,
     // Uint8List file,
   }) async {
-    String res = 'some error oocured';
+    String res = 'some error occured';
     try {
       if (userName.isNotEmpty ||
           bio.isNotEmpty ||

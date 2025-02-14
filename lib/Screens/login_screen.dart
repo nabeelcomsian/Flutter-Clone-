@@ -1,6 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram/Screens/signup_screen.dart';
 import 'package:instagram/Utils/colors.dart';
+import 'package:instagram/Utils/snack_bar.dart';
+import 'package:instagram/widgets/app_logo.dart';
 import 'package:instagram/widgets/text_field_input.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,6 +18,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailcontroller = TextEditingController();
   final TextEditingController _passwordcontroller = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool isloading = false;
 
   @override
   void dispose() {
@@ -20,6 +27,42 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordcontroller.dispose();
 
     super.dispose();
+  }
+
+  Future<void> loginUser() async {
+    setState(() {
+      isloading = true;
+    });
+    try {
+      if (_emailcontroller.text.isNotEmpty &&
+          _passwordcontroller.text.isNotEmpty) {
+        debugPrint('email and password are correct');
+        UserCredential usercredential = await _auth.signInWithEmailAndPassword(
+          email: _emailcontroller.text.trim(),
+          password: _passwordcontroller.text.trim(),
+        );
+        setState(() {
+          isloading = true;
+        });
+
+        if (usercredential.user != null && mounted) {
+          debugPrint(
+              'user login successfully${usercredential.user!.email.toString()}');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SignupScreen(),
+            ),
+          );
+        }
+      } else {
+        showSnackBar("Invalid Email or passwrod", context);
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(e.toString(), context);
+      }
+    }
   }
 
   @override
@@ -33,11 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(child: Container(), flex: 2),
-            SvgPicture.asset(
-              'assets/ic_instagram.svg',
-              color: primaryColor,
-              height: 45,
-            ),
+            const AppLogo(),
             const SizedBox(
               height: 40,
             ),
@@ -59,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 24,
             ),
             InkWell(
-              onTap: () {},
+              onTap: loginUser,
               child: Ink(
                 // alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -68,13 +107,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5))),
                 width: double.infinity,
-                child: const Center(
-                  child: Text(
-                    'Log in',
-                    style: TextStyle(
-                        color: Colors.white), // Optional: Set text color
-                  ),
-                ),
+                child: isloading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: primaryColor,
+                        ),
+                      )
+                    : const Center(
+                        child: Text(
+                          'Log in',
+                          style: TextStyle(
+                              color: Colors.white), // Optional: Set text color
+                        ),
+                      ),
               ),
             ),
             const SizedBox(
@@ -88,7 +133,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text("Don't have an account?"),
                 ),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    debugPrint('inside sign up gesture detector');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SignupScreen(),
+                      ),
+                    );
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: const Text(
