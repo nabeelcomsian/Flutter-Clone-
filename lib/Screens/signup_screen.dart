@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -53,19 +54,45 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       isLoading = true;
     });
-    final response = await AuthMethod().signUpUser(
-        userName: _userNamecontroller.text,
-        email: _emailcontroller.text,
-        bio: _biocontroller.text,
-        password: _passwordcontroller.text);
-    debugPrint('here is the reponse when signup hit $response');
 
-    if (response != 'success' && mounted) {
-      showSnackBar(response, context);
+    try {
+      final response = await AuthMethod().signUpUser(
+          userName: _userNamecontroller.text,
+          email: _emailcontroller.text,
+          bio: _biocontroller.text,
+          password: _passwordcontroller.text);
+
+      debugPrint('here is the response when signup hit $response');
+
+      if (response == 'success' && mounted) {
+        showSnackBar("Sign up successful!", context);
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        showSnackBar(response, context);
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+
+      if (error is FirebaseAuthException) {
+        if (error.code == 'email-already-in-use') {
+          showSnackBar(
+              "The email address is already in use by another account.",
+              context);
+        } else {
+          showSnackBar(
+              "Something went wrong. Please try again later.", context);
+        }
+      } else {
+        showSnackBar("Unknown error: $error", context);
+      }
     }
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override

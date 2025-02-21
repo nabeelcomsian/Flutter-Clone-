@@ -1,9 +1,7 @@
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/Models/User_Model.dart' as model;
 
 class AuthMethod {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -23,13 +21,19 @@ class AuthMethod {
           password.isNotEmpty) {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
-        await _firestore.collection('Users').doc(cred.user!.uid).set({
-          'name': userName,
-          'uid': cred.user!.uid,
-          'bio': bio,
-          'folowers': [],
-          'following': [],
-        });
+        // adding to data base
+        model.UserModel user = model.UserModel(
+            userName: userName,
+            bio: bio,
+            email: email,
+            followers: [],
+            following: [],
+            uid: cred.user!.uid);
+
+        await _firestore
+            .collection('Users')
+            .doc(cred.user!.uid)
+            .set(user.toJason());
         return res = 'succcess';
       }
     } catch (err) {
